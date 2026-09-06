@@ -20,6 +20,8 @@
 
 </div>
 
+![探索頁示意圖](docs/screenshot-explore.svg)
+![登入畫面示意圖](docs/screenshot-login.svg)
 ---
 
 ## 為什麼會有 SkillMon？
