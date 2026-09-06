@@ -43,7 +43,7 @@ SkillMon 把「自我成長」重新包裝成你熟悉的那種讓人上癮的�
 
 ![探索頁示意圖，含分類側邊欄、技能卡網格與右側詳情面板](screenshot-explore.svg)
 
-> 直接開始玩？直接開 [線上 Demo](https://chi-hsienchang.github.io/SkillMon/) 最快。如果你想放上自己實際操作的截圖，也歡迎把 `docs/screenshot-login.svg`、`docs/screenshot-explore.svg` 換成你自己的 `docs/screenshot-*.png`，並額外補上任務頁、成就頁的截圖：
+> 開始玩？直接開 [線上 Demo](https://chi-hsienchang.github.io/SkillMon/) 最快。如果你想放上自己實際操作的截圖，也歡迎把 `docs/screenshot-login.svg`、`docs/screenshot-explore.svg` 換成你自己的 `docs/screenshot-*.png`，並額外補上任務頁、成就頁的截圖：
 >
 > ```
 > docs/screenshot-quests.png       — 任務頁
