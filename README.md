@@ -166,18 +166,4 @@ skillmon/
 **Q：一定要用 Chrome 才能跑嗎？**
 不用，任何支援 ES2017+（`async/await`）與 `crypto.subtle` 的現代瀏覽器都可以，包含 Chrome、Edge、Firefox、Safari 最新版本。
 
----
-
-## 📄 授權
-
-本專案採用 [MIT License](./LICENSE) 授權，歡迎自由使用、修改與再散布。
-
-<div align="center">
-
-**如果 SkillMon 對你有幫助，給它一顆 ⭐️ 星星，是對這個小專案最大的鼓勵。**
-
-🎮 [立即體驗 SkillMon](https://chi-hsienchang.github.io/SkillMon/)　·　還沒玩過？先點「以訪客身分探索」，不用註冊馬上開始。
-
-Made with ✦ for people who'd rather level up than give up.
-
 </div>
