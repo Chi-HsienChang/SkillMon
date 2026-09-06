@@ -20,24 +20,6 @@
 
 </div>
 
-<table>
-<tr>
-<td width="50%" align="center">
-
-**登入畫面**
-
-![登入 / 註冊畫面示意圖](docs/screenshot-login.svg)
-
-</td>
-<td width="50%" align="center">
-
-**探索頁**
-
-![探索頁示意圖](docs/screenshot-explore.svg)
-
-</td>
-</tr>
-</table>
 ---
 
 ## 為什麼會有 SkillMon？
