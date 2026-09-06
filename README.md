@@ -12,7 +12,11 @@
 [![No build step](https://img.shields.io/badge/build%20step-none-65f5bd)](#)
 [![License: MIT](https://img.shields.io/badge/license-MIT-ffd76a)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-a56cff)](#-參與貢獻)
-[![Deploy: GitHub Pages](https://img.shields.io/badge/deploy-GitHub%20Pages-ff78c7)](#-三分鐘部署到-github-pages)
+[![Live Demo](https://img.shields.io/badge/demo-線上體驗-ff78c7)](https://chi-hsienchang.github.io/SkillMon/)
+
+### 🎮 [**點我立即體驗 → chi-hsienchang.github.io/SkillMon**](https://chi-hsienchang.github.io/SkillMon/)
+
+> 👉 **第一次進來？** 不用註冊，直接在登入畫面點「**以訪客身分探索**」，就能馬上把所有功能玩過一輪（收集、練習升級、任務、成就都能體驗，只是訪客資料不會被保存）。想長期累積進度，再回來註冊一個帳號即可。
 
 </div>
 
@@ -34,17 +38,33 @@ SkillMon 把「自我成長」重新包裝成你熟悉的那種讓人上癮的�
 
 ## 📸 畫面預覽
 
-> 深邃太空感 UI，以 Cinzel 襯線字體 + 金／青色霓虹點綴，搭配可收集卡牌與雷達式圓環細節。
->
-> 建議在部署後自行截圖，取代下方預覽位置：
+深邃太空感 UI，以襯線標題字體 + 金／青色霓虹點綴，搭配可收集卡牌與雷達式圓環細節。下面兩張是依實際版面配置與配色繪製的介面示意圖：
+
+<table>
+<tr>
+<td width="50%" align="center">
+
+**登入畫面 —— 訪客模式最顯眼**
+
+![登入 / 註冊畫面示意圖，訪客探索按鈕特別標示](docs/screenshot-login.svg)
+
+</td>
+<td width="50%" align="center">
+
+**探索頁 —— 收集網格 + 技能詳情**
+
+![探索頁示意圖，含分類側邊欄、技能卡網格與右側詳情面板](docs/screenshot-explore.svg)
+
+</td>
+</tr>
+</table>
+
+> 想看貨真價實的畫面？直接開 [線上 Demo](https://chi-hsienchang.github.io/SkillMon/) 最快。如果你想放上自己實際操作的截圖，也歡迎把 `docs/screenshot-login.svg`、`docs/screenshot-explore.svg` 換成你自己的 `docs/screenshot-*.png`，並額外補上任務頁、成就頁的截圖：
 >
 > ```
-> docs/screenshot-login.png     — 登入 / 註冊畫面
-> docs/screenshot-explore.png   — 探索頁（收集網格 + 詳情面板）
-> docs/screenshot-quests.png    — 任務頁
+> docs/screenshot-quests.png       — 任務頁
 > docs/screenshot-achievements.png — 成就頁
 > ```
-> 截圖完成後，把上面四行路徑貼進這個章節，用 `![畫面說明](docs/xxx.png)` 語法即可顯示。
 
 ---
 
@@ -98,9 +118,12 @@ SkillMon 把「自我成長」重新包裝成你熟悉的那種讓人上癮的�
 
 ```
 skillmon/
-├── index.html   # 整個網站（HTML + CSS + JS 都在同一檔案，零建置）
-├── README.md    # 就是你正在看的這份文件
-└── LICENSE      # MIT 授權
+├── index.html                    # 整個網站（HTML + CSS + JS 都在同一檔案，零建置）
+├── README.md                     # 就是你正在看的這份文件
+├── LICENSE                       # MIT 授權
+└── docs/
+    ├── screenshot-login.svg      # 登入畫面示意圖
+    └── screenshot-explore.svg    # 探索頁示意圖
 ```
 
 ---
@@ -158,5 +181,19 @@ skillmon/
 
 **Q：一定要用 Chrome 才能跑嗎？**
 不用，任何支援 ES2017+（`async/await`）與 `crypto.subtle` 的現代瀏覽器都可以，包含 Chrome、Edge、Firefox、Safari 最新版本。
+
+---
+
+## 📄 授權
+
+本專案採用 [MIT License](./LICENSE) 授權，歡迎自由使用、修改與再散布。
+
+<div align="center">
+
+**如果 SkillMon 對你有幫助，給它一顆 ⭐️ 星星，是對這個小專案最大的鼓勵。**
+
+🎮 [立即體驗 SkillMon](https://chi-hsienchang.github.io/SkillMon/)　·　還沒玩過？先點「以訪客身分探索」，不用註冊馬上開始。
+
+Made with ✦ for people who'd rather level up than give up.
 
 </div>
