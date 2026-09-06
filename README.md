@@ -94,42 +94,6 @@ SkillMon 把「自我成長」重新包裝成你熟悉的那種讓人上癮的�
 
 ---
 
-## 🚀 三分鐘部署到 GitHub Pages
-
-1. 在 GitHub 建立一個新的 repository，例如 `skillmon`
-2. 把 `index.html`、`README.md`（以及選用的 `LICENSE`）加進去並 push：
-
-   ```bash
-   git init
-   git add index.html README.md LICENSE
-   git commit -m "🎉 SkillMon v1.0 — 技能圖鑑上線"
-   git branch -M main
-   git remote add origin https://github.com/<你的帳號>/skillmon.git
-   git push -u origin main
-   ```
-
-3. 到 GitHub repo 的 **Settings → Pages**，Source 選擇 `Deploy from a branch`，Branch 選 `main` / `root`，儲存
-4. 等 1–2 分鐘，你的網站就會上線於：
-
-   ```
-   https://<你的帳號>.github.io/skillmon/
-   ```
-
-### 本機執行
-
-不需要任何指令，直接用瀏覽器打開 `index.html` 即可。若想要一個本機網址（部分瀏覽器對 `file://` 的儲存權限較嚴格，建議用簡易伺服器）：
-
-```bash
-# 任一種都可以
-python3 -m http.server 8080
-# 或
-npx serve .
-```
-
-然後打開 `http://localhost:8080`。
-
----
-
 ## 📂 專案結構
 
 ```
