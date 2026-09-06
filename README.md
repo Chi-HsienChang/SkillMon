@@ -141,7 +141,7 @@ skillmon/
 
 ---
 
-## ⚠️ 已知限制（誠實說明，不藏著掖著）
+## ⚠️ 已知限制
 
 這是一個**前端展示 / 個人專案等級**的帳號系統，適合作品集、教學示範、內部工具或原型驗證，但**還不是生產等級的正式會員系統**：
 
@@ -194,17 +194,5 @@ skillmon/
 
 **Q：一定要用 Chrome 才能跑嗎？**
 不用，任何支援 ES2017+（`async/await`）與 `crypto.subtle` 的現代瀏覽器都可以，包含 Chrome、Edge、Firefox、Safari 最新版本。
-
----
-
-## 📄 授權
-
-本專案採用 [MIT License](./LICENSE) 授權，歡迎自由使用、修改與再散布。
-
-<div align="center">
-
-**如果 SkillMon 對你有幫助，給它一顆 ⭐️ 星星，是對這個小專案最大的鼓勵。**
-
-Made with ✦ for people who'd rather level up than give up.
 
 </div>
