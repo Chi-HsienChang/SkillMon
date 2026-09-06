@@ -46,14 +46,14 @@ SkillMon 把「自我成長」重新包裝成你熟悉的那種讓人上癮的�
 
 **登入畫面 —— 訪客模式最顯眼**
 
-![登入 / 註冊畫面示意圖，訪客探索按鈕特別標示](docs/screenshot-login.svg)
+![登入 / 註冊畫面示意圖，訪客探索按鈕特別標示](screenshot-login.svg)
 
 </td>
 <td width="50%" align="center">
 
 **探索頁 —— 收集網格 + 技能詳情**
 
-![探索頁示意圖，含分類側邊欄、技能卡網格與右側詳情面板](docs/screenshot-explore.svg)
+![探索頁示意圖，含分類側邊欄、技能卡網格與右側詳情面板](screenshot-explore.svg)
 
 </td>
 </tr>
