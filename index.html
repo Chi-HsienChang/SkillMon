@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillMon — 技能圖鑑</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --bg:#050814; --panel:rgba(8,14,31,.82); --panel2:rgba(13,21,43,.72);
+  --line:rgba(121,178,255,.28); --cyan:#55d9ff; --blue:#5d8dff;
+  --purple:#a56cff; --gold:#ffd76a; --text:#edf5ff; --muted:#8d9bb8;
+  --red:#ff6b7d; --green:#65f5bd;
+}
+*{box-sizing:border-box}
+.hidden{display:none !important}
+body{margin:0;color:var(--text);font-family:"Noto Sans TC",sans-serif;background:
+ radial-gradient(circle at 75% 15%,rgba(91,73,255,.22),transparent 28%),
+ radial-gradient(circle at 15% 85%,rgba(0,209,255,.13),transparent 28%),
+ linear-gradient(135deg,#030610,#081226 55%,#050816);min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;background-image:
+ linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+ background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent)}
+button{font-family:inherit}
+input:focus,button:focus,a:focus{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* ===== Auth screen ===== */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;z-index:2}
+.auth-card{width:100%;max-width:400px;border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(18px);border-radius:18px;padding:34px 30px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.auth-logo{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:26px;text-align:center}
+.auth-logo .logo-mark{width:54px;height:54px;border:1px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold);font-size:27px;box-shadow:0 0 26px rgba(255,215,106,.28)}
+.auth-logo h1{font:700 28px Cinzel,serif;letter-spacing:5px;margin:0}
+.auth-logo small{display:block;color:#93a0b9;letter-spacing:3px;font-size:10px;margin-top:4px}
+.auth-tabs{display:flex;border:1px solid rgba(118,160,220,.3);border-radius:10px;overflow:hidden;margin-bottom:22px}
+.auth-tab{flex:1;padding:11px 0;background:rgba(12,22,44,.5);color:#8d9bb8;border:0;cursor:pointer;font-size:14px;font-weight:600;transition:.2s}
+.auth-tab.active{background:linear-gradient(90deg,rgba(58,145,255,.28),rgba(81,92,255,.1));color:#fff;box-shadow:inset 0 -2px var(--cyan)}
+.field{margin-bottom:15px}
+.field label{display:block;color:#9aa8c1;font-size:12px;letter-spacing:1px;margin-bottom:6px}
+.field input{width:100%;padding:11px 13px;border-radius:9px;border:1px solid rgba(118,160,220,.3);background:rgba(8,14,30,.85);color:#fff;font-size:14px}
+.field input::placeholder{color:#4c5975}
+.field-hint{color:#6d7b96;font-size:11px;margin-top:5px}
+.auth-error{color:var(--red);font-size:13px;background:rgba(255,107,125,.08);border:1px solid rgba(255,107,125,.3);border-radius:8px;padding:9px 12px;margin-bottom:15px;display:none}
+.auth-error.show{display:block}
+.btn-primary{width:100%;padding:13px;border:1px solid var(--gold);border-radius:9px;background:rgba(255,215,106,.1);color:#ffe59a;font-weight:700;cursor:pointer;font-size:15px;transition:.2s}
+.btn-primary:hover{background:rgba(255,215,106,.18);box-shadow:0 0 22px rgba(255,215,106,.15)}
+.btn-primary:disabled{opacity:.5;cursor:wait}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:#556278;font-size:11px}
+.auth-divider:before,.auth-divider:after{content:"";flex:1;height:1px;background:rgba(118,160,220,.2)}
+.btn-guest{width:100%;padding:12px;border:1px solid rgba(118,160,220,.3);border-radius:9px;background:transparent;color:#aebbd1;cursor:pointer;font-size:13px}
+.btn-guest:hover{border-color:var(--cyan);color:#fff}
+.auth-note{margin-top:16px;color:#5c6a85;font-size:11px;line-height:1.6;text-align:center}
+
+/* ===== App shell ===== */
+header{height:78px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 30px;gap:35px;background:rgba(3,7,18,.72);backdrop-filter:blur(18px);position:sticky;top:0;z-index:10}
+.logo{display:flex;align-items:center;gap:13px;min-width:250px}
+.logo-mark{width:42px;height:42px;border:1px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold);font-size:21px;box-shadow:0 0 22px rgba(255,215,106,.25)}
+.logo h1{font:700 24px Cinzel,serif;letter-spacing:4px;margin:0}
+.logo small{display:block;color:#93a0b9;letter-spacing:3px;font-size:9px;margin-top:2px}
+nav{display:flex;gap:28px;height:100%;align-items:center}
+nav a{height:100%;display:flex;align-items:center;color:#aebbd1;text-decoration:none;font-size:16px;position:relative;cursor:pointer}
+nav a.active{color:#fff}
+nav a.active:after{content:"";position:absolute;bottom:0;left:15%;right:15%;height:2px;background:var(--gold);box-shadow:0 0 12px var(--gold)}
+.search{margin-left:auto;width:275px;height:40px;border:1px solid rgba(118,160,220,.3);border-radius:10px;background:rgba(8,14,30,.8);display:flex;align-items:center;padding:0 14px;color:#71809d;gap:9px}
+.search input{border:0;outline:0;background:transparent;color:#fff;width:100%;font-size:14px}
+.profile{display:flex;align-items:center;gap:10px;position:relative;cursor:pointer;padding:6px 8px;border-radius:10px}
+.profile:hover{background:rgba(255,255,255,.04)}
+.avatar{width:38px;height:38px;border:1px solid #89a6df;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#27375f,#11192d);font-size:14px;font-weight:700}
+.level{font-size:13px;font-weight:700}.xpmini{width:95px;height:5px;background:#1a2943;border-radius:5px;margin-top:5px;overflow:hidden}.xpmini i{display:block;height:100%;background:var(--cyan);box-shadow:0 0 9px var(--cyan);transition:width .4s}
+.pname{font-size:11px;color:#8492ab;max-width:95px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.profile-menu{position:absolute;top:56px;right:0;width:210px;border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(18px);border-radius:12px;padding:14px;box-shadow:0 15px 40px rgba(0,0,0,.4);z-index:20}
+.profile-menu .pm-name{font-weight:700;font-size:15px}
+.profile-menu .pm-sub{color:#8492ab;font-size:11px;margin-top:2px;margin-bottom:12px}
+.pm-stat{display:flex;justify-content:space-between;font-size:12px;color:#9aa8c1;padding:5px 0}
+.pm-stat b{color:var(--cyan)}
+.pm-logout{width:100%;margin-top:10px;padding:9px;border:1px solid rgba(255,107,125,.35);border-radius:8px;background:rgba(255,107,125,.06);color:#ff96a4;cursor:pointer;font-size:13px}
+.pm-logout:hover{background:rgba(255,107,125,.14)}
+main{max-width:1500px;margin:auto;padding:32px 30px 50px}
+.hero{height:175px;display:flex;align-items:center;padding:15px 35px;position:relative;overflow:hidden;border-radius:18px;margin-bottom:24px;background:
+ radial-gradient(circle at 72% 30%,rgba(99,79,255,.27),transparent 30%),
+ linear-gradient(90deg,rgba(8,16,38,.96),rgba(8,18,43,.6),rgba(10,12,30,.3));border:1px solid rgba(100,160,255,.2)}
+.hero:after{content:"✦";position:absolute;right:90px;top:15px;font-size:140px;color:rgba(85,217,255,.08);transform:rotate(12deg)}
+.hero h2{font:600 43px Cinzel,"Noto Sans TC",serif;margin:0 0 8px;color:#fff0b0;text-shadow:0 0 22px rgba(255,215,106,.22)}
+.hero p{margin:0;color:#aab8d0;font-size:16px}.hero .tag{color:var(--cyan);letter-spacing:3px;font-size:11px;margin-bottom:8px}
+.layout{display:grid;grid-template-columns:205px 1fr 350px;gap:20px}
+.sidebar,.collection,.detail{border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(15px);border-radius:15px}
+.sidebar{padding:15px 10px;height:max-content}
+.side-title{color:#687895;font-size:11px;letter-spacing:2px;padding:8px 12px}
+.side-btn{width:100%;border:0;background:transparent;color:#aab7d0;text-align:left;padding:13px 14px;border-radius:10px;font-size:15px;cursor:pointer;display:flex;gap:12px;align-items:center;margin:3px 0}
+.side-btn:hover,.side-btn.active{background:linear-gradient(90deg,rgba(58,145,255,.2),rgba(81,92,255,.05));color:#fff;box-shadow:inset 2px 0 var(--cyan)}
+.side-icon{width:25px;text-align:center;font-size:18px}
+.collection{padding:18px}
+.toolbar{display:flex;align-items:center;gap:9px;margin-bottom:18px;flex-wrap:wrap}
+.filter{padding:9px 18px;border:1px solid rgba(125,168,235,.25);border-radius:8px;background:rgba(12,22,44,.65);color:#9eabc1;cursor:pointer}
+.filter.active{border-color:var(--cyan);color:#fff;box-shadow:0 0 13px rgba(85,217,255,.12)}
+.sort{margin-left:auto;color:#8290a9;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.empty-note{color:#5c6a85;font-size:13px;padding:40px 10px;text-align:center;grid-column:1/-1}
+.card{min-height:190px;padding:10px;border-radius:13px;border:1px solid rgba(112,153,220,.26);background:linear-gradient(145deg,rgba(18,28,55,.92),rgba(7,13,29,.96));position:relative;cursor:pointer;transition:.25s;overflow:hidden}
+.card:hover{transform:translateY(-4px);border-color:rgba(85,217,255,.65);box-shadow:0 10px 30px rgba(0,0,0,.35),0 0 22px rgba(85,217,255,.1)}
+.card.selected{border:1px solid var(--gold);box-shadow:0 0 22px rgba(255,215,106,.14)}
+.rarity{position:absolute;right:9px;top:8px;color:var(--gold);font-size:14px}.card-icon{height:96px;display:grid;place-items:center;font-size:53px;text-shadow:0 0 22px currentColor;filter:drop-shadow(0 0 12px currentColor);color:var(--card-color,var(--cyan))}
+.card-name{text-align:center;font-size:15px;font-weight:700}.card-type{text-align:center;color:#73819d;font-size:11px;margin-top:3px}.card-id{text-align:center;color:#586681;font-size:10px;margin-top:6px;letter-spacing:1px}
+.locked{filter:grayscale(1);opacity:.5}.locked .card-icon{font-size:44px;text-shadow:none}
+.detail{padding:20px;position:relative;min-height:570px}
+.detail-art{height:210px;border:1px solid rgba(85,217,255,.24);border-radius:13px;background:radial-gradient(circle,rgba(39,130,255,.2),transparent 48%),linear-gradient(145deg,#07152d,#0b0d22);display:grid;place-items:center;position:relative;overflow:hidden}
+.detail-art:before{content:"";position:absolute;width:170px;height:170px;border:1px solid rgba(85,217,255,.3);border-radius:50%;box-shadow:0 0 25px rgba(85,217,255,.14);animation:spin 18s linear infinite}
+.detail-art:after{content:"";position:absolute;width:115px;height:115px;border:1px dashed rgba(255,215,106,.35);border-radius:50%;animation:spin 11s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.bigicon{font-size:75px;z-index:1;text-shadow:0 0 35px var(--cyan)}
+.detail-head{display:flex;align-items:end;justify-content:space-between;margin:18px 0 5px}.detail h3{font:600 28px Cinzel,"Noto Sans TC",serif;margin:0}.badge{font-size:11px;color:#79e7ff;border:1px solid rgba(85,217,255,.35);padding:4px 8px;border-radius:6px}
+.desc{color:#9aa8c1;line-height:1.75;font-size:13px}
+.status{margin-top:16px;border:1px solid rgba(74,225,255,.4);color:#65e4ff;text-align:center;padding:10px;border-radius:22px;background:rgba(34,190,230,.07)}
+.status.locked-status{border-color:rgba(140,150,175,.35);color:#9ca8bd;background:rgba(140,150,175,.05)}
+.stat{margin-top:17px}.statrow{display:flex;justify-content:space-between;font-size:12px;color:#8492ab;margin-bottom:8px}.statrow strong{font-size:22px;color:#66dcff}.bar{height:9px;border-radius:10px;background:#17243d;overflow:hidden;border:1px solid rgba(105,150,220,.18)}.bar i{display:block;height:100%;background:linear-gradient(90deg,#48bfff,#7b72ff);box-shadow:0 0 12px #48bfff;transition:width .5s}
+.unlock-cost{margin-top:17px;border:1px dashed rgba(255,215,106,.4);border-radius:10px;padding:12px 14px;font-size:12px;color:#c8b98a;display:flex;justify-content:space-between;align-items:center}
+.unlock-cost b{color:var(--gold);font-size:16px}
+.quote{margin:20px 0;padding:13px 15px;border-left:2px solid var(--gold);background:rgba(255,215,106,.035);color:#b3bdd0;font-size:12px;font-style:italic}
+.practice{width:100%;padding:12px;border:1px solid var(--gold);border-radius:9px;background:rgba(255,215,106,.07);color:#ffe59a;font-weight:700;cursor:pointer;transition:.2s}.practice:hover{background:rgba(255,215,106,.15);box-shadow:0 0 20px rgba(255,215,106,.12)}
+.practice:disabled{opacity:.45;cursor:not-allowed}
+.toast{position:fixed;bottom:25px;left:50%;transform:translate(-50%,30px);opacity:0;padding:13px 20px;background:#0c1730;border:1px solid var(--cyan);border-radius:10px;box-shadow:0 0 30px rgba(85,217,255,.2);transition:.3s;z-index:30;max-width:90vw;text-align:center}.toast.show{transform:translate(-50%,0);opacity:1}
+
+/* ===== Quests & Achievements ===== */
+.view-panel{border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(15px);border-radius:15px;padding:22px}
+.view-panel h2{font:600 22px Cinzel,"Noto Sans TC",serif;margin:0 0 4px;color:#fff0b0}
+.view-panel .view-sub{color:#8492ab;font-size:13px;margin-bottom:20px}
+.qa-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.quest-card,.ach-card{border:1px solid rgba(112,153,220,.26);background:linear-gradient(145deg,rgba(18,28,55,.85),rgba(7,13,29,.9));border-radius:13px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.qa-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.qa-title{font-weight:700;font-size:15px}
+.qa-tag{font-size:10px;letter-spacing:1px;padding:3px 8px;border-radius:20px;border:1px solid rgba(85,217,255,.35);color:var(--cyan);white-space:nowrap}
+.qa-tag.milestone{border-color:rgba(165,108,255,.45);color:var(--purple)}
+.qa-desc{color:#9aa8c1;font-size:12.5px;line-height:1.6}
+.qa-reward{font-size:11px;color:#7f8dab}
+.qa-reward b{color:var(--gold)}
+.qa-btn{margin-top:auto;padding:9px;border-radius:8px;border:1px solid rgba(255,215,106,.4);background:rgba(255,215,106,.08);color:#ffe59a;font-weight:700;cursor:pointer;font-size:13px}
+.qa-btn:hover{background:rgba(255,215,106,.16)}
+.qa-btn:disabled{opacity:.4;cursor:not-allowed;border-color:rgba(140,150,175,.3);color:#8492ab;background:transparent}
+.ach-card{align-items:center;text-align:center}
+.ach-icon{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:24px;border:1px solid rgba(255,215,106,.4);color:var(--gold);box-shadow:0 0 18px rgba(255,215,106,.15)}
+.ach-card.locked .ach-icon{border-color:rgba(140,150,175,.3);color:#66738f;box-shadow:none}
+.ach-card.locked .qa-title{color:#66738f}
+.ach-card.locked{opacity:.6}
+@media(max-width:1100px){.layout{grid-template-columns:170px 1fr}.detail{grid-column:1/-1}.grid{grid-template-columns:repeat(3,1fr)}.search{display:none}}
+@media(max-width:720px){header{padding:0 15px}.logo{min-width:auto}.logo h1{font-size:18px}.logo small,nav{display:none}main{padding:20px 14px}.hero{height:145px;padding:20px}.hero h2{font-size:30px}.layout{grid-template-columns:1fr}.sidebar{display:grid;grid-template-columns:repeat(4,1fr)}.side-title{display:none}.side-btn{justify-content:center;padding:9px 4px}.side-btn span:last-child{display:none}.grid{grid-template-columns:repeat(2,1fr)}.collection{padding:12px}.qa-grid{grid-template-columns:1fr}.pname{display:none}}
+</style>
+</head>
+<body>
+
+<div class="auth-wrap" id="authScreen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-mark">✦</div>
+      <h1>SkillMon</h1>
+      <small>COLLECT · LEARN · GROW</small>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" type="button">登入</button>
+      <button class="auth-tab" id="tabRegister" type="button">註冊</button>
+    </div>
+    <div class="auth-error" id="authError"></div>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="loginUser">帳號</label>
+        <input id="loginUser" autocomplete="username" placeholder="輸入帳號" />
+      </div>
+      <div class="field">
+        <label for="loginPass">密碼</label>
+        <input id="loginPass" type="password" autocomplete="current-password" placeholder="輸入密碼" />
+      </div>
+      <button class="btn-primary" id="loginSubmit" type="submit">登入</button>
+    </form>
+
+    <form id="registerForm" class="hidden">
+      <div class="field">
+        <label for="regUser">帳號</label>
+        <input id="regUser" autocomplete="username" placeholder="2–16 個字元" />
+      </div>
+      <div class="field">
+        <label for="regPass">密碼</label>
+        <input id="regPass" type="password" autocomplete="new-password" placeholder="至少 4 個字元" />
+      </div>
+      <div class="field">
+        <label for="regPass2">確認密碼</label>
+        <input id="regPass2" type="password" autocomplete="new-password" placeholder="再次輸入密碼" />
+      </div>
+      <button class="btn-primary" id="registerSubmit" type="submit">建立帳號</button>
+    </form>
+
+    <div class="auth-divider">或</div>
+    <button class="btn-guest" id="guestBtn" type="button">以訪客身分探索（資料不會保存）</button>
+    <p class="auth-note">此為前端展示用帳號系統：密碼會先雜湊後才儲存，但仍請勿使用你在其他地方也使用的真實密碼。資料預設儲存在目前瀏覽器內，換裝置或清除瀏覽器資料會遺失，詳見 README。</p>
+  </div>
+</div>
+
+<div id="appRoot" class="hidden">
+<header>
+  <div class="logo">
+    <div class="logo-mark">✦</div>
+    <div><h1>SkillMon</h1><small>COLLECT · LEARN · GROW</small></div>
+  </div>
+  <nav>
+    <a class="active" data-view="explore" href="#">探索</a>
+    <a data-view="mydex" href="#">我的圖鑑</a>
+    <a data-view="quests" href="#">任務</a>
+    <a data-view="achievements" href="#">成就</a>
+  </nav>
+  <label class="search">⌕ <input id="search" placeholder="搜尋技能..." /></label>
+  <div class="profile" id="profileBtn">
+    <div class="avatar" id="avatarEl">♙</div>
+    <div>
+      <div class="level" id="levelEl">Lv. 1</div>
+      <div class="xpmini"><i id="xpmini" style="width:0%"></i></div>
+      <div class="pname" id="pnameEl"></div>
+    </div>
+    <div class="profile-menu hidden" id="profileMenu">
+      <div class="pm-name" id="pmName">—</div>
+      <div class="pm-sub" id="pmSub">—</div>
+      <div class="pm-stat"><span>技能點</span><b id="pmPoints">0</b></div>
+      <div class="pm-stat"><span>已收集技能</span><b id="pmOwned">0 / 16</b></div>
+      <div class="pm-stat"><span>累積練習次數</span><b id="pmPractice">0</b></div>
+      <button class="pm-logout" id="logoutBtn">登出</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div><div class="tag">SKILLS · BUILD · A BRIGHTER FUTURE</div><h2>發現新的技能</h2><p>每一個技能，都是通往新世界的鑰匙。</p></div>
+  </section>
+
+  <div class="layout" id="exploreView">
+    <aside class="sidebar">
+      <div class="side-title">SKILL CATEGORIES</div>
+      <button class="side-btn active" data-cat="全部"><span class="side-icon">✦</span><span>全部</span></button>
+      <button class="side-btn" data-cat="程式開發"><span class="side-icon">⌘</span><span>程式開發</span></button>
+      <button class="side-btn" data-cat="資料分析"><span class="side-icon">◫</span><span>資料分析</span></button>
+      <button class="side-btn" data-cat="設計創作"><span class="side-icon">✎</span><span>設計創作</span></button>
+      <button class="side-btn" data-cat="生產力"><span class="side-icon">◆</span><span>生產力</span></button>
+      <button class="side-btn" data-cat="人際互動"><span class="side-icon">☁</span><span>人際互動</span></button>
+      <button class="side-btn" data-cat="思維能力"><span class="side-icon">◉</span><span>思維能力</span></button>
+      <button class="side-btn" data-cat="語言溝通"><span class="side-icon">◇</span><span>語言溝通</span></button>
+    </aside>
+
+    <section class="collection">
+      <div class="toolbar">
+        <button class="filter active" data-filter="all">全部</button>
+        <button class="filter" data-filter="locked">未收集</button>
+        <button class="filter" data-filter="owned">已收集</button>
+        <div class="sort">排序：<b>熱門</b> ▾</div>
+      </div>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <aside class="detail">
+      <div class="detail-art"><div class="bigicon" id="bigicon">⌘</div></div>
+      <div class="detail-head"><h3 id="detailName">程式設計</h3><span class="badge" id="detailId">#001</span></div>
+      <div class="desc" id="detailDesc"></div>
+      <div class="status" id="detailStatus">✓ 已收集</div>
+      <div class="stat" id="ownedStatBlock">
+        <div class="statrow"><span>帳號等級進度</span><span id="expLabel">0 / 100 EXP</span></div>
+        <div class="statrow"><strong id="levelBig">Lv. 1</strong><span></span></div>
+        <div class="bar"><i id="expbar" style="width:0%"></i></div>
+      </div>
+      <div class="unlock-cost hidden" id="unlockBlock">
+        <span>解鎖所需技能點</span><b id="unlockCostLabel">5</b>
+      </div>
+      <div class="quote" id="detailQuote">「程式不只是工具，更是一種創造未來的語言。」</div>
+      <button class="practice" id="practice">前往練習　→</button>
+    </aside>
+  </div>
+
+  <div class="view-panel hidden" id="questsView">
+    <h2>任務</h2>
+    <div class="view-sub">完成任務可獲得經驗值與技能點，技能點可用於解鎖新技能。每日任務會在隔天重置。</div>
+    <div class="qa-grid" id="questsGrid"></div>
+  </div>
+
+  <div class="view-panel hidden" id="achievementsView">
+    <h2>成就</h2>
+    <div class="view-sub">成就會依照你的收集與練習進度自動解鎖，無需手動領取。</div>
+    <div class="qa-grid" id="achGrid"></div>
+  </div>
+</main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ 資料定義 ============ */
+const skills=[
+ {id:"001",name:"程式設計",type:"程式開發",icon:"⌘",color:"#57dfff",ownedDefault:true,desc:"用程式碼打造想法，讓創意變成現實。這是一項能改變世界的技能。",quote:"「程式不只是工具，更是一種創造未來的語言。」"},
+ {id:"002",name:"問題解決",type:"思維能力",icon:"◉",color:"#76a7ff",ownedDefault:true,desc:"拆解複雜問題、找到關鍵線索，並建立可執行的解決方案。",quote:"「每個問題，都是尚未拆解的答案。」"},
+ {id:"003",name:"英語溝通",type:"語言溝通",icon:"◇",color:"#ad72ff",ownedDefault:true,desc:"讓資訊跨越語言與文化的邊界，建立更有效的溝通能力。",quote:"「語言是通往另一個世界的門。」"},
+ {id:"004",name:"創意設計",type:"設計創作",icon:"✦",color:"#ff78c7",ownedDefault:true,desc:"把抽象想法轉化成清晰、具有吸引力的視覺與體驗。",quote:"「美感，是把複雜變簡單的能力。」"},
+ {id:"005",name:"資料分析",type:"資料分析",icon:"▥",color:"#ffd66b",ownedDefault:true,desc:"從資料中發現規律，將數字轉化為可以支持決策的洞察。",quote:"「數字不會說謊，但需要有人翻譯。」"},
+ {id:"006",name:"時間管理",type:"生產力",icon:"◷",color:"#65f5bd",ownedDefault:true,desc:"管理注意力與時間，讓重要的事情得到真正的進展。",quote:"「時間平等地流向每個人，差別在於用法。」"},
+ {id:"007",name:"團隊合作",type:"人際互動",icon:"♧",color:"#8fd6ff",ownedDefault:true,desc:"與不同角色協作，讓個人的能力轉化成團隊的力量。",quote:"「一個人走得快，一群人走得遠。」"},
+ {id:"008",name:"專案管理",type:"生產力",icon:"⬡",color:"#ffcf63",ownedDefault:true,desc:"從目標、任務到交付，掌握複雜專案的節奏與進度。",quote:"「管理專案，其實是在管理不確定性。」"},
+ {id:"009",name:"領導力",type:"人際互動",icon:"▲",color:"#ff9d7a",ownedDefault:true,desc:"建立方向、凝聚共識，帶領團隊一起完成有價值的事情。",quote:"「領導不是走在最前面，而是讓大家願意跟上。」"},
+ {id:"010",name:"影像剪輯",type:"設計創作",icon:"▣",color:"#c893ff",ownedDefault:true,desc:"透過影像、聲音與節奏，把故事變成有感染力的作品。",quote:"「剪接台上的每一刀，都是說故事的選擇。」"},
+ {id:"011",name:"深度專注",type:"思維能力",icon:"◈",color:"#7ef0c9",ownedDefault:false,desc:"尚未收集。訓練長時間投入單一任務、抵抗分心的能力。",quote:"「專注，是這個時代最稀有的資源。」"},
+ {id:"012",name:"AI 應用",type:"程式開發",icon:"ϟ",color:"#ffd76a",ownedDefault:false,desc:"尚未收集。探索 AI 世界，解鎖全新的工作方式。",quote:"「工具會變，但駕馭工具的能力不會。」"},
+ {id:"013",name:"公開演講",type:"人際互動",icon:"☊",color:"#ff8fb3",ownedDefault:false,desc:"尚未收集。讓你的想法被聽見，並產生真正的影響。",quote:"「站上台，是把想法變成行動的一步。」"},
+ {id:"014",name:"自我學習",type:"思維能力",icon:"♧",color:"#6fe0ff",ownedDefault:false,desc:"尚未收集。建立自己的學習系統，持續升級。",quote:"「最好的老師，是你自己建立的方法。」"},
+ {id:"015",name:"跨文化理解",type:"人際互動",icon:"◉",color:"#b48bff",ownedDefault:false,desc:"尚未收集。理解不同觀點，讓世界變得更大。",quote:"「理解差異，是打開視野的第一步。」"},
+ {id:"016",name:"策略思考",type:"思維能力",icon:"✧",color:"#ffe08a",ownedDefault:false,desc:"尚未收集。看見全局，在不確定性中做出更好的選擇。",quote:"「策略，是在有限資源裡做出最好的選擇。」"}
+];
+
+const UNLOCK_COST=5;
+
+const questDefs=[
+ {id:"daily_login",title:"每日簽到",desc:"每天造訪 SkillMon，即可領取獎勵。",type:"daily",reward:{exp:20},
+  claimable:p=>true},
+ {id:"daily_practice",title:"完成一次練習",desc:"在「探索」頁面對任一已收集技能按下「前往練習」。",type:"daily",reward:{exp:15,points:1},
+  claimable:p=>p.lastPracticeDate===todayStr()},
+ {id:"collect_5",title:"嶄露頭角",desc:"累積收集 5 項技能。",type:"milestone",reward:{exp:50,points:2},
+  claimable:p=>p.ownedSkills.length>=5},
+ {id:"collect_10",title:"技能學徒",desc:"累積收集 10 項技能。",type:"milestone",reward:{exp:100,points:3},
+  claimable:p=>p.ownedSkills.length>=10},
+ {id:"collect_all",title:"圖鑑大師",desc:"收集全部 16 項技能。",type:"milestone",reward:{exp:300,points:10},
+  claimable:p=>p.ownedSkills.length>=skills.length},
+ {id:"reach_lv5",title:"穩健成長",desc:"讓帳號等級達到 5 級。",type:"milestone",reward:{points:3},
+  claimable:p=>p.level>=5}
+];
+
+const achievementDefs=[
+ {id:"first",title:"初心者",desc:"建立你的 SkillMon 帳號",icon:"✦",check:p=>true},
+ {id:"collector5",title:"收藏家",desc:"收集 5 項技能",icon:"★",check:p=>p.ownedSkills.length>=5},
+ {id:"collector10",title:"技能學徒",desc:"收集 10 項技能",icon:"◆",check:p=>p.ownedSkills.length>=10},
+ {id:"collectorAll",title:"圖鑑大師",desc:"收集全部技能",icon:"♛",check:p=>p.ownedSkills.length>=skills.length},
+ {id:"practice20",title:"練習狂",desc:"累積練習 20 次",icon:"⚡",check:p=>p.totalPracticeCount>=20},
+ {id:"level10",title:"資深探索者",desc:"帳號等級達到 10 級",icon:"▲",check:p=>p.level>=10}
+];
+
+/* ============ 狀態 ============ */
+let state={user:null,progress:null};
+let currentCat="全部", currentFilter="all", currentView="explore", selected=null;
+
+/* ============ 工具函式 ============ */
+function todayStr(){return new Date().toISOString().slice(0,10)}
+function expNeeded(level){return 80+(level-1)*45}
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.classList.add("show");
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove("show"),2600);
+}
+async function hashPassword(pw){
+  const salted=pw+"::skillmon-salt";
+  try{
+    if(window.crypto&&crypto.subtle){
+      const enc=new TextEncoder().encode(salted);
+      const buf=await crypto.subtle.digest("SHA-256",enc);
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+    }
+  }catch(e){}
+  let h=0;
+  for(let i=0;i<salted.length;i++){h=(h<<5)-h+salted.charCodeAt(i);h|=0}
+  return "fb"+Math.abs(h).toString(16);
+}
+function defaultProgress(username){
+  return{
+    username,
+    level:1,exp:0,skillPoints:0,
+    ownedSkills:skills.filter(s=>s.ownedDefault).map(s=>s.id),
+    totalPracticeCount:0,
+    lastPracticeDate:null,
+    questClaims:{},
+    createdAt:Date.now()
+  };
+}
+
+/* ============ 儲存層 ============
+   在 Claude 這類支援 window.storage 的環境中，帳號資料會存在跨裝置共用的雲端儲存空間；
+   若當作一般網站部署（例如 GitHub Pages），環境沒有 window.storage，
+   則自動改用瀏覽器 localStorage 做為本機資料庫（僅該瀏覽器可見，重灌或換裝置會遺失）。 */
+const _localBackend={
+  async get(key){
+    try{
+      const raw=localStorage.getItem("skillmon:"+key);
+      return raw===null?null:{key,value:raw};
+    }catch(e){return null}
+  },
+  async set(key,value){
+    try{localStorage.setItem("skillmon:"+key,value);return{key,value}}catch(e){return null}
+  },
+  async delete(key){
+    try{localStorage.removeItem("skillmon:"+key);return{key,deleted:true}}catch(e){return null}
+  }
+};
+function hasCloudStorage(){
+  return typeof window!=="undefined"&&window.storage&&typeof window.storage.get==="function";
+}
+const storageBackend=hasCloudStorage()?window.storage:_localBackend;
+
+async function storageGetAccount(username){
+  try{
+    const r=await storageBackend.get("account:"+username,true);
+    return r?JSON.parse(r.value):null;
+  }catch(e){return null}
+}
+async function storageSetAccount(data){
+  try{
+    const r=await storageBackend.set("account:"+data.username,JSON.stringify(data),true);
+    return !!r;
+  }catch(e){return false}
+}
+async function storageGetProgress(username){
+  try{
+    const r=await storageBackend.get("progress:"+username,true);
+    return r?JSON.parse(r.value):null;
+  }catch(e){return null}
+}
+async function storageSetProgress(progress){
+  try{
+    const r=await storageBackend.set("progress:"+progress.username,JSON.stringify(progress),true);
+    return !!r;
+  }catch(e){return false}
+}
+async function persist(){
+  if(!state.user||state.user.isGuest)return;
+  await storageSetProgress(state.progress);
+}
+
+/* ============ 驗證 ============ */
+function validUsername(u){return /^[A-Za-z0-9_\u4e00-\u9fa5]{2,16}$/.test(u)}
+function setAuthError(msg){
+  const el=document.getElementById("authError");
+  if(!msg){el.classList.remove("show");el.textContent="";return}
+  el.textContent=msg;el.classList.add("show");
+}
+
+/* ============ 登入 / 註冊 / 訪客 / 登出 ============ */
+async function handleLogin(e){
+  e.preventDefault();
+  setAuthError("");
+  const username=document.getElementById("loginUser").value.trim();
+  const password=document.getElementById("loginPass").value;
+  if(!username||!password){setAuthError("請輸入帳號與密碼");return}
+  const btn=document.getElementById("loginSubmit");
+  btn.disabled=true;btn.textContent="登入中...";
+  try{
+    const account=await storageGetAccount(username);
+    if(!account){setAuthError("帳號不存在，請先註冊");return}
+    const hash=await hashPassword(password);
+    if(hash!==account.passwordHash){setAuthError("密碼錯誤");return}
+    let progress=await storageGetProgress(username);
+    if(!progress)progress=defaultProgress(username);
+    state.user={username,isGuest:false};
+    state.progress=progress;
+    enterApp();
+  }finally{
+    btn.disabled=false;btn.textContent="登入";
+  }
+}
+async function handleRegister(e){
+  e.preventDefault();
+  setAuthError("");
+  const username=document.getElementById("regUser").value.trim();
+  const password=document.getElementById("regPass").value;
+  const password2=document.getElementById("regPass2").value;
+  if(!validUsername(username)){setAuthError("帳號需為 2–16 個字元（英數、底線或中文）");return}
+  if(password.length<4){setAuthError("密碼至少需要 4 個字元");return}
+  if(password!==password2){setAuthError("兩次輸入的密碼不一致");return}
+  const btn=document.getElementById("registerSubmit");
+  btn.disabled=true;btn.textContent="建立中...";
+  try{
+    const existing=await storageGetAccount(username);
+    if(existing){setAuthError("此帳號已被使用，請換一個");return}
+    const passwordHash=await hashPassword(password);
+    const ok=await storageSetAccount({username,passwordHash,createdAt:Date.now()});
+    if(!ok){setAuthError("帳號建立失敗，請稍後再試");return}
+    const progress=defaultProgress(username);
+    await storageSetProgress(progress);
+    state.user={username,isGuest:false};
+    state.progress=progress;
+    showToast(`🎉 歡迎加入，${username}！`);
+    enterApp();
+  }finally{
+    btn.disabled=false;btn.textContent="建立帳號";
+  }
+}
+function handleGuest(){
+  const guestName="訪客"+Math.floor(1000+Math.random()*9000);
+  state.user={username:guestName,isGuest:true};
+  state.progress=defaultProgress(guestName);
+  showToast("🔮 訪客模式：探索紀錄不會被保存");
+  enterApp();
+}
+function handleLogout(){
+  state.user=null;state.progress=null;selected=null;
+  currentView="explore";currentCat="全部";currentFilter="all";
+  document.getElementById("appRoot").classList.add("hidden");
+  document.getElementById("authScreen").classList.remove("hidden");
+  document.getElementById("loginForm").reset();
+  document.getElementById("registerForm").reset();
+  document.getElementById("profileMenu").classList.add("hidden");
+  setAuthError("");
+}
+function enterApp(){
+  document.getElementById("authScreen").classList.add("hidden");
+  document.getElementById("appRoot").classList.remove("hidden");
+  selected=skills.find(s=>state.progress.ownedSkills.includes(s.id))||skills[0];
+  claimDailyLogin();
+  renderAll();
+}
+async function claimDailyLogin(){
+  const q=questDefs.find(q=>q.id==="daily_login");
+  if(state.progress.questClaims[q.id]!==todayStr()){
+    state.progress.questClaims[q.id]=todayStr();
+    addExp(q.reward.exp);
+    await persist();
+    showToast(`🌅 每日簽到成功！+${q.reward.exp} EXP`);
+  }
+}
+
+/* ============ 經驗值 / 練習 / 解鎖 ============ */
+function addExp(amount){
+  let leveledUp=false;
+  state.progress.exp+=amount;
+  while(state.progress.exp>=expNeeded(state.progress.level)){
+    state.progress.exp-=expNeeded(state.progress.level);
+    state.progress.level++;
+    state.progress.skillPoints++;
+    leveledUp=true;
+  }
+  return leveledUp;
+}
+async function practiceSkill(){
+  if(!selected||!isOwned(selected))return;
+  const gained=15+Math.floor(Math.random()*16);
+  state.progress.totalPracticeCount++;
+  state.progress.lastPracticeDate=todayStr();
+  const leveledUp=addExp(gained);
+  showToast(leveledUp?`✨ 練習完成，+${gained} EXP，🎉 等級提升至 Lv.${state.progress.level}！`:`✨ 練習完成，獲得 ${gained} 經驗值！`);
+  await persist();
+  renderHeader();renderDetail();
+  if(currentView==="quests")renderQuests();
+  if(currentView==="achievements")renderAchievements();
+}
+async function unlockSelected(){
+  if(!selected||isOwned(selected))return;
+  if(state.progress.skillPoints<UNLOCK_COST){
+    showToast(`🔒 技能點不足，還差 ${UNLOCK_COST-state.progress.skillPoints} 點（練習或完成任務可獲得）`);
+    return;
+  }
+  state.progress.skillPoints-=UNLOCK_COST;
+  state.progress.ownedSkills.push(selected.id);
+  showToast(`🎉 已解鎖新技能：${selected.name}！`);
+  await persist();
+  renderAll();
+}
+async function claimQuest(qid){
+  const q=questDefs.find(x=>x.id===qid);
+  if(!q)return;
+  if(q.type==="daily"){
+    if(state.progress.questClaims[q.id]===todayStr())return;
+    if(!q.claimable(state.progress)){showToast("尚未達成領取條件");return}
+    state.progress.questClaims[q.id]=todayStr();
+  }else{
+    if(state.progress.questClaims[q.id])return;
+    if(!q.claimable(state.progress)){showToast("尚未達成領取條件");return}
+    state.progress.questClaims[q.id]=true;
+  }
+  let msg="🎁 已領取獎勵：";
+  const parts=[];
+  if(q.reward.exp){addExp(q.reward.exp);parts.push("+"+q.reward.exp+" EXP")}
+  if(q.reward.points){state.progress.skillPoints+=q.reward.points;parts.push("+"+q.reward.points+" 技能點")}
+  showToast(msg+parts.join("　"));
+  await persist();
+  renderHeader();renderQuests();renderAchievements();
+}
+
+function isOwned(skill){return state.progress.ownedSkills.includes(skill.id)}
+
+/* ============ 渲染 ============ */
+function renderAll(){
+  renderHeader();
+  renderGrid();
+  renderDetail();
+  renderQuests();
+  renderAchievements();
+}
+function renderHeader(){
+  const p=state.progress,u=state.user;
+  document.getElementById("avatarEl").textContent=u.isGuest?"♙":u.username.slice(0,1).toUpperCase();
+  document.getElementById("levelEl").textContent="Lv. "+p.level;
+  document.getElementById("xpmini").style.width=Math.min(100,Math.round(p.exp/expNeeded(p.level)*100))+"%";
+  document.getElementById("pnameEl").textContent=u.username;
+  document.getElementById("pmName").textContent=u.username;
+  document.getElementById("pmSub").textContent=u.isGuest?"訪客模式（不會保存資料）":"Lv. "+p.level+" · "+p.exp+"/"+expNeeded(p.level)+" EXP";
+  document.getElementById("pmPoints").textContent=p.skillPoints;
+  document.getElementById("pmOwned").textContent=p.ownedSkills.length+" / "+skills.length;
+  document.getElementById("pmPractice").textContent=p.totalPracticeCount;
+}
+function renderGrid(){
+  const q=document.getElementById("search").value.toLowerCase();
+  const forceOwned=currentView==="mydex";
+  const list=skills.filter(s=>{
+    const owned=isOwned(s);
+    if(forceOwned&&!owned)return false;
+    if(currentCat!=="全部"&&s.type!==currentCat)return false;
+    if(!forceOwned&&currentFilter!=="all"&&(currentFilter==="owned"?!owned:owned))return false;
+    if(q&&!(s.name.toLowerCase().includes(q)||s.type.toLowerCase().includes(q)))return false;
+    return true;
+  });
+  const grid=document.getElementById("grid");
+  if(list.length===0){
+    grid.innerHTML='<div class="empty-note">沒有符合條件的技能。'+(forceOwned?"快去探索頁收集更多技能吧！":"")+"</div>";
+    return;
+  }
+  grid.innerHTML=list.map(s=>{
+    const owned=isOwned(s);
+    return `<article class="card ${owned?'':'locked'} ${selected&&s.id===selected.id?'selected':''}" data-id="${s.id}" style="--card-color:${s.color}">
+   <span class="rarity">${owned?'★':'🔒'}</span><div class="card-icon">${s.icon}</div>
+   <div class="card-name">${s.name}</div><div class="card-type">${s.type}</div><div class="card-id">#${s.id}</div>
+  </article>`;
+  }).join("");
+  grid.querySelectorAll(".card").forEach(c=>c.onclick=()=>selectSkill(c.dataset.id));
+}
+function selectSkill(id){
+  selected=skills.find(s=>s.id===id)||skills[0];
+  renderDetail();
+  renderGrid();
+}
+function renderDetail(){
+  if(!selected)return;
+  const owned=isOwned(selected);
+  const p=state.progress;
+  document.getElementById("bigicon").textContent=selected.icon;
+  document.getElementById("bigicon").style.color=selected.color;
+  document.getElementById("detailName").textContent=selected.name;
+  document.getElementById("detailId").textContent="#"+selected.id;
+  document.getElementById("detailDesc").textContent=selected.desc;
+  document.getElementById("detailQuote").textContent=owned?selected.quote:"「這項技能仍隱藏在迷霧之中，等待被解鎖。」";
+
+  const statusEl=document.getElementById("detailStatus");
+  statusEl.textContent=owned?"✓ 已收集":"🔒 尚未收集";
+  statusEl.classList.toggle("locked-status",!owned);
+
+  document.getElementById("ownedStatBlock").classList.toggle("hidden",false);
+  document.getElementById("expLabel").textContent=p.exp+" / "+expNeeded(p.level)+" EXP";
+  document.getElementById("levelBig").textContent="Lv. "+p.level;
+  document.getElementById("expbar").style.width=Math.min(100,Math.round(p.exp/expNeeded(p.level)*100))+"%";
+
+  document.getElementById("unlockBlock").classList.toggle("hidden",owned);
+  document.getElementById("unlockCostLabel").textContent=UNLOCK_COST+"（你目前有 "+p.skillPoints+" 點）";
+
+  const btn=document.getElementById("practice");
+  btn.textContent=owned?"前往練習　→":"解鎖技能　→";
+  btn.disabled=false;
+  btn.onclick=owned?practiceSkill:unlockSelected;
+}
+function renderQuests(){
+  const p=state.progress;
+  document.getElementById("questsGrid").innerHTML=questDefs.map(q=>{
+    const claimedToday=q.type==="daily"&&p.questClaims[q.id]===todayStr();
+    const claimedOnce=q.type==="milestone"&&!!p.questClaims[q.id];
+    const claimed=claimedToday||claimedOnce;
+    const ready=!claimed&&q.claimable(p);
+    const rewardText=[q.reward.exp?("+"+q.reward.exp+" EXP"):null,q.reward.points?("+"+q.reward.points+" 技能點"):null].filter(Boolean).join("　");
+    let btnLabel="尚未達成";
+    if(claimed)btnLabel=q.type==="daily"?"今日已領取":"已領取";
+    else if(ready)btnLabel="領取獎勵";
+    return `<div class="quest-card">
+      <div class="qa-top"><span class="qa-title">${q.title}</span><span class="qa-tag ${q.type==='milestone'?'milestone':''}">${q.type==='daily'?'每日':'里程碑'}</span></div>
+      <div class="qa-desc">${q.desc}</div>
+      <div class="qa-reward">獎勵：<b>${rewardText}</b></div>
+      <button class="qa-btn" data-qid="${q.id}" ${(!ready||claimed)?'disabled':''}>${btnLabel}</button>
+    </div>`;
+  }).join("");
+  document.querySelectorAll("#questsGrid .qa-btn").forEach(b=>b.onclick=()=>claimQuest(b.dataset.qid));
+}
+function renderAchievements(){
+  const p=state.progress;
+  document.getElementById("achGrid").innerHTML=achievementDefs.map(a=>{
+    const unlocked=a.check(p);
+    return `<div class="ach-card ${unlocked?'':'locked'}">
+      <div class="ach-icon">${a.icon}</div>
+      <div class="qa-title">${a.title}</div>
+      <div class="qa-desc">${a.desc}</div>
+      <div class="qa-reward">${unlocked?'✓ 已解鎖':'🔒 尚未解鎖'}</div>
+    </div>`;
+  }).join("");
+}
+
+/* ============ 導覽 / 篩選事件 ============ */
+function setView(view){
+  currentView=view;
+  document.querySelectorAll("nav a").forEach(a=>a.classList.toggle("active",a.dataset.view===view||(view==="mydex"&&a.dataset.view==="mydex")));
+  document.getElementById("exploreView").classList.toggle("hidden",view!=="explore"&&view!=="mydex");
+  document.getElementById("questsView").classList.toggle("hidden",view!=="quests");
+  document.getElementById("achievementsView").classList.toggle("hidden",view!=="achievements");
+  if(view==="explore"||view==="mydex")renderGrid();
+  if(view==="quests")renderQuests();
+  if(view==="achievements")renderAchievements();
+}
+
+/* ============ 事件綁定（一次性） ============ */
+document.getElementById("tabLogin").onclick=()=>{
+  document.getElementById("tabLogin").classList.add("active");
+  document.getElementById("tabRegister").classList.remove("active");
+  document.getElementById("loginForm").classList.remove("hidden");
+  document.getElementById("registerForm").classList.add("hidden");
+  setAuthError("");
+};
+document.getElementById("tabRegister").onclick=()=>{
+  document.getElementById("tabRegister").classList.add("active");
+  document.getElementById("tabLogin").classList.remove("active");
+  document.getElementById("registerForm").classList.remove("hidden");
+  document.getElementById("loginForm").classList.add("hidden");
+  setAuthError("");
+};
+document.getElementById("loginForm").addEventListener("submit",handleLogin);
+document.getElementById("registerForm").addEventListener("submit",handleRegister);
+document.getElementById("guestBtn").onclick=handleGuest;
+document.getElementById("logoutBtn").onclick=handleLogout;
+document.getElementById("profileBtn").addEventListener("click",e=>{
+  e.stopPropagation();
+  document.getElementById("profileMenu").classList.toggle("hidden");
+});
+document.addEventListener("click",()=>document.getElementById("profileMenu").classList.add("hidden"));
+document.getElementById("profileMenu").addEventListener("click",e=>e.stopPropagation());
+
+document.querySelectorAll("nav a").forEach(a=>a.addEventListener("click",e=>{
+  e.preventDefault();
+  setView(a.dataset.view);
+}));
+document.querySelectorAll(".side-btn").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".side-btn").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  currentCat=b.dataset.cat;
+  renderGrid();
+});
+document.querySelectorAll(".filter").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  currentFilter=b.dataset.filter;
+  renderGrid();
+});
+document.getElementById("search").addEventListener("input",renderGrid);
+</script>
+</body>
+</html>
